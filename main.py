@@ -436,7 +436,8 @@ class relay():
     def off(self):
         #turn off GPIO defined in class
         GPIO.output(self.pin, True)
-		
+
+
 ##### Functions #####
 def run_cmd(cmd):
     p = Popen(cmd, shell=True, stdout=PIPE)
@@ -449,4 +450,83 @@ def Temp():
 
 def check_ButtonState():
     return False
+
+
+##### Main #####
+def main():
+    if __name__ == '__main__':
+        #create class instances
+        lcd = LCD_Driver()
+        temp = DHT11(DHTPin)
+        light = relay(27)
+        heat = relay(17)
+
+        #if in debug mode display IP address
+        if DEBUG:
+            ipaddr = run_cmd(cmd)
+            lcd.message('IP %s'%ipaddr)
+            print('IP %s'%ipaddr)
+            sleep(5)
+         
+        #get initial temp
+        while True:
+            result = temp.read()
+            if result.is_valid():
+                room_temperature = result.temperature
+                break
+            else:
+                #if invalad, print the error to debug screen
+                print("Error: %d" % result.error_code)
+
+        #Update Loop
+        while True:
+            #clear any text on the display
+            lcd.clear()
+            #read the DHT senser
+            result = temp.read()
+            #print the time and date on first line
+            lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
+
+            #check if alarm should go off
+            time_now = datetime.now().strftime('%H:%M')
+            #note, time is in 24 hour format
+            alarm_time = '07:00'
+            if time_now == alarm_time:
+                print("ALARM!!!")
+                #play a mp3 file while still updating time
+                media_player = subprocess.Popen(['omxplayer', '-o', 'local', 'Alarm.mp3'])
+                #if button pressed turn alarm off
+                while True:
+                    lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
+                    lcd.message('Temp: %s'%room_temperature+'C')
+                    if check_ButtonState():
+                        player.stdin.write("q")
+                        break
+                media_player.kill()
+                media_player.terminate()
+
+            #check results
+            if result.is_valid():
+                room_temperature = result.temperature
+            else:
+                #if invalad, print the error to debug screen
+                print("Error: %d" % result.error_code)
+
+            #debug mode
+            if DEBUG:
+                print("Temperature: %d C" % result.temperature)
+                print("Humidity: %d %%" % result.humidity)
+
+            #print temperature on secound line of LCD
+            lcd.message('Temp: %s'%room_temperature+'C')
+
+            #pause for refresh rate secounds  
+            sleep(refresh_rate)
+       
+##### Run and Cleanup #####
+try:
+    main()
+finally:
+    GPIO.cleanup()
+
 
