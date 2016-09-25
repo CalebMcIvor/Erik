@@ -436,3 +436,17 @@ class relay():
     def off(self):
         #turn off GPIO defined in class
         GPIO.output(self.pin, True)
+		
+##### Functions #####
+def run_cmd(cmd):
+    p = Popen(cmd, shell=True, stdout=PIPE)
+    output = p.communicate()[0]
+    return output
+
+def Temp():
+    Result = temp.read()
+    return Result.temperature
+
+def check_ButtonState():
+    return False
+
