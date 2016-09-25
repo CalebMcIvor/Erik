@@ -11,6 +11,8 @@ import os
 DHTPin = 7
 #refresh rate in secounds for main loop
 refresh_rate = 2
+#time for alarm to sound
+alarm_time = '07:00'
 #command for IP address
 cmd = "ip addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1"
 #debug mode True/False
@@ -487,23 +489,26 @@ def main():
             #print the time and date on first line
             lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
 
-            #check if alarm should go off
+			#note, time is in 24 hour format
             time_now = datetime.now().strftime('%H:%M')
-            #note, time is in 24 hour format
-            alarm_time = '07:00'
+			#check if alarm should go off
             if time_now == alarm_time:
                 print("ALARM!!!")
                 #play a mp3 file while still updating time
                 media_player = subprocess.Popen(['omxplayer', '-o', 'local', 'Alarm.mp3'])
-                #if button pressed turn alarm off
+				#Turn Light Relay on
+				light.on()
+                #if button pressed turn alarm off, otherwise loop
                 while True:
                     lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
                     lcd.message('Temp: %s'%room_temperature+'C')
                     if check_ButtonState():
                         player.stdin.write("q")
                         break
+				#stop the alarm file from playing
                 media_player.kill()
                 media_player.terminate()
+				#note: the light will stay on untill it is turned off via another method
 
             #check results
             if result.is_valid():
