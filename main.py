@@ -428,7 +428,7 @@ class DHT11:
 class relay:
     """Control a relay or pin, create an instance with pin number. dont setup pin that is done in initial setup of the class"""
     def __init__(self, pin):
-        pin = self.pin
+        self.pin = pin
         GPIO.setup(self.pin, GPIO.OUT)
 
     def on(self):
