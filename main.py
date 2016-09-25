@@ -496,8 +496,8 @@ def main():
                 print("ALARM!!!")
                 #play a mp3 file while still updating time
                 media_player = subprocess.Popen(['omxplayer', '-o', 'local', 'Alarm.mp3'])
-				#Turn Light Relay on
-				light.on()
+                #Turn Light Relay on
+                light.on()
                 #if button pressed turn alarm off, otherwise loop
                 while True:
                     lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
