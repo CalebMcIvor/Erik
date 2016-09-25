@@ -30,7 +30,7 @@ for arg in sys.argv[1:]:
     if arg == '-a' or arg == '--advance-debug':
         print('Advance Debug Mode')
         DEBUG = 'High'
-        commands.append('-a    Advance Debug Mode)
+        commands.append('-a    Advance Debug Mode')
         
     if arg == '-h' or arg == '--help':
         print('Help')
