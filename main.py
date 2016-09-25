@@ -489,9 +489,9 @@ def main():
             #print the time and date on first line
             lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
 
-			#note, time is in 24 hour format
+            #note, time is in 24 hour format
             time_now = datetime.now().strftime('%H:%M')
-			#check if alarm should go off
+            #check if alarm should go off
             if time_now == alarm_time:
                 print("ALARM!!!")
                 #play a mp3 file while still updating time
@@ -505,16 +505,16 @@ def main():
                     if check_ButtonState():
                         player.stdin.write("q")
                         break
-				#stop the alarm file from playing
+                #stop the alarm file from playing
                 media_player.kill()
                 media_player.terminate()
-				#note: the light will stay on untill it is turned off via another method
+                #note: the light will stay on untill it is turned off via another method
 
             #check results
             if result.is_valid():
                 room_temperature = result.temperature
             else:
-			    if DEBUG == 'Medium' or DEBUG == 'High':
+                if DEBUG == 'Medium' or DEBUG == 'High':
                     #if invalad, print the error to debug screen
                     print("Error: %d" % result.error_code)
 
