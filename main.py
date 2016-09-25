@@ -25,7 +25,7 @@ for arg in sys.argv[1:]:
     if arg == '-d' or arg == '--debug':
         print('Debug Mode')
         DEBUG = 'Medium'
-        commands.append('-d    Debug Mode)
+        commands.append('-d    Debug Mode')
 
     if arg == '-a' or arg == '--advance-debug':
         print('Advance Debug Mode')
