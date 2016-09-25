@@ -16,7 +16,7 @@ alarm_time = '07:00'
 #command for IP address
 cmd = "ip addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1"
 #debug mode True/False
-DEBUG = False
+DEBUG = 'Medium'
 
 ##### Define Classes #####
 #LCD Class
@@ -514,11 +514,12 @@ def main():
             if result.is_valid():
                 room_temperature = result.temperature
             else:
-                #if invalad, print the error to debug screen
-                print("Error: %d" % result.error_code)
+			    if DEBUG == 'Medium' or DEBUG == 'High':
+                    #if invalad, print the error to debug screen
+                    print("Error: %d" % result.error_code)
 
             #debug mode
-            if DEBUG:
+            if DEBUG == 'High':
                 print("Temperature: %d C" % result.temperature)
                 print("Humidity: %d %%" % result.humidity)
 
