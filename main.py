@@ -459,6 +459,13 @@ class relay:
         #turn off GPIO defined in class
         GPIO.output(self.pin, True)
 
+class input:
+    def __init__(self, pin):
+        self.pin = pin
+        GPIO.setup(self.pin, GPIO.IN)
+    
+    def check(self):
+        return False
 
 ##### Functions #####
 def run_cmd(cmd):
@@ -482,6 +489,9 @@ def main():
         temp = DHT11(DHTPin)
         light = relay(17)
         heat = relay(27)
+        #add pin numbers
+        button = input(4)
+        motion = imput(22)
 
         #if in debug mode display IP address
         if DEBUG:
@@ -522,7 +532,7 @@ def main():
                 while True:
                     lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
                     lcd.message('Temp: %s'%room_temperature+'C')
-                    if check_ButtonState():
+                    if button.check():
                         player.stdin.write("q")
                         break
                 #stop the alarm file from playing
