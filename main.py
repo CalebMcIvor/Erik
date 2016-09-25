@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 from time import sleep, strftime
 from subprocess import *
 from datetime import datetime
+import sys
 import os
 
 ##### Constants #####
@@ -15,8 +16,19 @@ refresh_rate = 2
 alarm_time = '07:00'
 #command for IP address
 cmd = "ip addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1"
-#debug mode True/False
-DEBUG = 'Medium'
+#debug mode [Low, Medium, High] default: Low
+DEBUG = 'Low'
+
+#get aguments passed from terminal
+for arg in sys.argv[1:]:
+    if arg == '-d' or arg == '--debug':
+        print('Debug Mode')
+        DEBUG = 'Medium'
+
+    if arg == '-a' or arg == '--advance-debug':
+        print('Advance Debug Mode')
+        DEBUG = 'High'
+
 
 ##### Define Classes #####
 #LCD Class
@@ -460,8 +472,8 @@ def main():
         #create class instances
         lcd = LCD_Driver()
         temp = DHT11(DHTPin)
-        light = relay(27)
-        heat = relay(17)
+        light = relay(17)
+        heat = relay(27)
 
         #if in debug mode display IP address
         if DEBUG:
@@ -534,5 +546,3 @@ try:
     main()
 finally:
     GPIO.cleanup()
-
-
