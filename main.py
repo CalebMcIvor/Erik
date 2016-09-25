@@ -20,14 +20,22 @@ cmd = "ip addr show eth0 | grep inet | awk '{print $2}' | cut -d/ -f1"
 DEBUG = 'Low'
 
 #get aguments passed from terminal
+commands = []
 for arg in sys.argv[1:]:
     if arg == '-d' or arg == '--debug':
         print('Debug Mode')
         DEBUG = 'Medium'
+        commands.append('-d    Debug Mode)
 
     if arg == '-a' or arg == '--advance-debug':
         print('Advance Debug Mode')
         DEBUG = 'High'
+        commands.append('-a    Advance Debug Mode)
+        
+    if arg == '-h' or arg == '--help':
+        print('Help')
+        for command in commands:
+            print(command)
 
 
 ##### Define Classes #####
