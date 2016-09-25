@@ -425,7 +425,7 @@ class DHT11:
     def __calculate_checksum(self, the_bytes):
         return the_bytes[0] + the_bytes[1] + the_bytes[2] + the_bytes[3] & 255
 
-class relay():
+class relay:
     """Control a relay or pin, create an instance with pin number. dont setup pin that is done in initial setup of the class"""
     def __init__(self, pin):
         pin = self.pin
