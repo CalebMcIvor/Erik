@@ -468,9 +468,8 @@ class input:
         return False
 
 ##### Functions #####
-def run_cmd(cmd):
-    p = Popen(cmd, shell=True, stdout=PIPE)
-    output = p.communicate()[0]
+def run_cmd(cmd_to_run):
+    output = subprocess.check_output(cmd_to_run, shell=True)
     return output
 
 def Temp():
