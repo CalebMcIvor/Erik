@@ -1,41 +1,34 @@
-# Echo client program
+
+#!/usr/bin/python3
+# This is client.py file
+
 import socket
-import sys
 
-class Socket:
-    """demonstration class only
-      - coded for clarity, not efficiency
-    """
 
-    def __init__(self, sock=None):
-        if sock is None:
-            self.sock = socket.socket(
-                            socket.AF_INET, socket.SOCK_STREAM)
-        else:
-            self.sock = sock
+class connection:
+    def __init__(self, port, host, size):
+        self.port = port
+        self.host = host
+        self.size = size
 
-    def connect(self, host, port):
-        self.sock.connect((host, port))
+        # create a socket object
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def send(self, msg):
-        totalsent = 0
-        while totalsent < MSGLEN:
-            sent = self.sock.send(msg[totalsent:])
-            if sent == 0:
-                raise RuntimeError("socket connection broken")
-            totalsent = totalsent + sent
+        # connection to hostname on the port.
+        self.socket.connect((self.host, self.port)) 
 
-    def receive(self):
-        chunks = []
-        bytes_recd = 0
-        while bytes_recd < MSGLEN:
-            chunk = self.sock.recv(min(MSGLEN - bytes_recd, 2048))
-            if chunk == b'':
-                raise RuntimeError("socket connection broken")
-            chunks.append(chunk)
-            bytes_recd = bytes_recd + len(chunk)
-        return b''.join(chunks)
+    def recive(self):
+        msg = self.socket.recv(self.size)
+        return msg.decode('ascii')
 
-MySocket = Socket()
-MySocket.connect('powerbox.home', 5000)
-MySocket.send('This is a test: "Hello World!"')
+    def send(self, message):
+        self.socket.send(message.encode('ascii'))
+
+    def close(self):
+        self.socket.close()
+
+Erik = connection(9999, 'PowerBox', 1024) 
+
+print(Erik.recive())
+Erik.send("Hello World!")
+Erik.close()

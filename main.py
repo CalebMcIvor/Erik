@@ -2,8 +2,9 @@
 ##### Imports #####
 import RPi.GPIO as GPIO  
 from time import sleep, strftime
-from subprocess import *
+import subprocess
 from datetime import datetime
+from multiprocessing import Process
 import sys
 import os
 
@@ -480,86 +481,97 @@ def check_ButtonState():
     return False
 
 
-##### Main #####
-def main():
-    if __name__ == '__main__':
-        #create class instances
-        lcd = LCD_Driver()
-        temp = DHT11(DHTPin)
-        light = relay(17)
-        heat = relay(27)
-        #add pin numbers
-        button = input(4)
-        motion = imput(22)
+def update_time():
+    #create class instances
+    lcd = LCD_Driver()
+    temp = DHT11(DHTPin)
+    light = relay(17)
+    heat = relay(27)
+    #add pin numbers
+    button = input(4)
+    motion = input(22)
+    
 
-        #if in debug mode display IP address
-        if DEBUG:
-            ipaddr = run_cmd(cmd)
-            lcd.message('IP %s'%ipaddr)
-            print('IP %s'%ipaddr)
-            sleep(5)
-         
-        #get initial temp
-        while True:
-            result = temp.read()
-            if result.is_valid():
-                room_temperature = result.temperature
-                break
-            else:
+    #if in debug mode display IP address
+    if DEBUG == 'Medium':
+        ipaddr = run_cmd(cmd)
+        lcd.message('IP %s'%ipaddr)
+        print('IP %s'%ipaddr)
+        sleep(5)
+     
+    #get initial temp
+    for i in range(2000):
+        result = temp.read()
+        if result.is_valid():
+            room_temperature = result.temperature
+            break
+        else:
+            #if invalad, print the error to debug screen
+            print("Error: %d" % result.error_code)
+                
+    #Update Loop
+    while True:
+        #clear any text on the display
+        lcd.clear()
+        #read the DHT senser
+        result = temp.read()
+        #print the time and date on first line
+        lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
+
+        #note, time is in 24 hour format
+        time_now = datetime.now().strftime('%H:%M')
+        #check if alarm should go off
+        if time_now == alarm_time:
+            alarm()
+
+        #check results
+        if result.is_valid():
+            room_temperature = result.temperature
+        else:
+            if DEBUG == 'Medium' or DEBUG == 'High':
                 #if invalad, print the error to debug screen
                 print("Error: %d" % result.error_code)
 
-        #Update Loop
-        while True:
-            #clear any text on the display
-            lcd.clear()
-            #read the DHT senser
-            result = temp.read()
-            #print the time and date on first line
-            lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
+        #debug mode
+        if DEBUG == 'High':
+            print("Temperature: %d C" % result.temperature)
+            print("Humidity: %d %%" % result.humidity)
 
-            #note, time is in 24 hour format
-            time_now = datetime.now().strftime('%H:%M')
-            #check if alarm should go off
-            if time_now == alarm_time:
-                print("ALARM!!!")
-                #play a mp3 file while still updating time
-                media_player = subprocess.Popen(['omxplayer', '-o', 'local', 'Alarm.mp3'])
-                #Turn Light Relay on
-                light.on()
-                #if button pressed turn alarm off, otherwise loop
-                while True:
-                    lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
-                    lcd.message('Temp: %s'%room_temperature+'C')
-                    if button.check():
-                        player.stdin.write("q")
-                        break
-                #stop the alarm file from playing
-                media_player.kill()
-                media_player.terminate()
-                #note: the light will stay on untill it is turned off via another method
+        #print temperature on secound line of LCD
+        lcd.message('Temp: %s'%room_temperature+'C')
 
-            #check results
-            if result.is_valid():
-                room_temperature = result.temperature
-            else:
-                if DEBUG == 'Medium' or DEBUG == 'High':
-                    #if invalad, print the error to debug screen
-                    print("Error: %d" % result.error_code)
+        #pause for refresh rate secounds  
+        sleep(refresh_rate)    
 
-            #debug mode
-            if DEBUG == 'High':
-                print("Temperature: %d C" % result.temperature)
-                print("Humidity: %d %%" % result.humidity)
-
-            #print temperature on secound line of LCD
-            lcd.message('Temp: %s'%room_temperature+'C')
-
-            #pause for refresh rate secounds  
-            sleep(refresh_rate)
-       
+        
+def alarm():
+    print("ALARM!!!")
+    #play a mp3 file while still updating time
+    media_player = subprocess.Popen(['omxplayer', '-o', 'local', 'Alarm.mp3'])
+    #Turn Light Relay on
+    light.on()
+    #if button pressed turn alarm off, otherwise loop
+    while True:
+        lcd.message(datetime.now().strftime('%b %d %H:%M\n'))
+        lcd.message('Temp: %s'%room_temperature+'C')
+        if button.check():
+            player.stdin.write("q")
+            break
+    #stop the alarm file from playing
+    media_player.kill()
+    media_player.terminate()
+    #note: the light will stay on untill it is turned off via another method
+    
+        
+def listen():
+    pass
+    
+##### Main #####
 ##### Run and Cleanup #####
 try:
-    main()
+    if __name__ == '__main__':
+        UpdateTime = Process(target=update_time)
+        UpdateTime.start()
+        
 finally:
     GPIO.cleanup()
