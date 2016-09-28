@@ -5,6 +5,7 @@ from time import sleep, strftime
 import subprocess
 from datetime import datetime
 from multiprocessing import Process
+import speech_recognition
 import sys
 import os
 
@@ -468,6 +469,13 @@ class input:
     def check(self):
         return False
 
+        
+class speech_engine:
+    def speak():
+        pass
+    def listen():
+        pass
+        
 ##### Functions #####
 def run_cmd(cmd_to_run):
     output = subprocess.check_output(cmd_to_run, shell=True)
@@ -479,6 +487,10 @@ def Temp():
 
 def check_ButtonState():
     return False
+    
+def listen():
+    voice = speech_engine()
+    voice.listen()
 
 
 def update_time():
